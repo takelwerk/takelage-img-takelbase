@@ -1,0 +1,10 @@
+# frozen_string_literal: true
+
+require 'rake'
+
+namespace :image do
+  namespace :docker do
+    desc 'Create multipostgres image'
+    task 'takelbase': "image:docker:takelbase:#{@project['dockerhub_tag']}"
+  end
+end

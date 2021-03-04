@@ -1,0 +1,6 @@
+---
+name: takelage-img-takelbase
+local_user: packer_local
+dockerhub_user: takelage
+dockerhub_repo: takelbase
+dockerhub_tag: debian-buster

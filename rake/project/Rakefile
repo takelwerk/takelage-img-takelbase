@@ -1,0 +1,12 @@
+# frozen_string_literal: true
+
+require 'rake'
+
+namespace :project do
+  desc 'Create and deploy takelbase image to dockerhub'
+  task prod: %w[dockerhub:registry:login
+                rubylint
+                image:docker:takelbase
+                dockerhub:registry:tag
+                dockerhub:registry:push]
+end

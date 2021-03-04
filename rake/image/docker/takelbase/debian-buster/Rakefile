@@ -1,0 +1,24 @@
+# frozen_string_literal: true
+
+require 'rake'
+
+cmd_image_debianbuster = 'docker pull debian:buster-slim && ' \
+        'mkdir -p packer/images/debian/buster && ' \
+        'cd packer && packer build ' \
+        "--var 'base_repo=debian' " \
+        "--var 'base_tag=buster-slim' " \
+        "--var 'target_user=#{@project['local_user']}' " \
+        "--var 'target_repo=#{@project['dockerhub_repo']}' " \
+        "--var 'target_tag=latest' " \
+        'templates/docker/takelbase/base/debian-buster/packer.json'
+
+namespace :image do
+  namespace :docker do
+    namespace :takelbase do
+      desc 'Build multipostgres 11 image with packer'
+      task :'debian-buster' do
+        @commands << cmd_image_debianbuster
+      end
+    end
+  end
+end
