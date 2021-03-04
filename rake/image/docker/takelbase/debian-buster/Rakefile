@@ -15,7 +15,7 @@ cmd_image_debianbuster = 'docker pull debian:buster-slim && ' \
 namespace :image do
   namespace :docker do
     namespace :takelbase do
-      desc 'Build multipostgres 11 image with packer'
+      desc 'Build takelbase debian buster image with packer'
       task :'debian-buster' do
         @commands << cmd_image_debianbuster
       end

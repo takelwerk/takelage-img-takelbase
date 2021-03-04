@@ -4,7 +4,7 @@ require 'rake'
 
 namespace :image do
   namespace :docker do
-    desc 'Create multipostgres image'
+    desc 'Create takelbase image'
     task 'takelbase': "image:docker:takelbase:#{@project['dockerhub_tag']}"
   end
 end
