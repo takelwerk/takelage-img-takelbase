@@ -7,6 +7,6 @@ namespace :project do
   task prod: %w[dockerhub:registry:login
                 rubylint
                 image:docker:takelbase
-                dockerhub:registry:tag
-                dockerhub:registry:push]
+                dockerhub:registry:tag:latest
+                dockerhub:registry:push:latest]
 end
