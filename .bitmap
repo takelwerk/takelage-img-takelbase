@@ -19,7 +19,7 @@
         "origin": "IMPORTED",
         "originallySharedDir": "rake/dockerhub/registry"
     },
-    "takelage.rake/rake/meta@0.0.7": {
+    "takelage.rake/rake/meta@0.0.9": {
         "files": [
             {
                 "name": "README.bit",
