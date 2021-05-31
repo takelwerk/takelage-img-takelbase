@@ -14,7 +14,7 @@ variable "target_repo" {
 
 variable "target_tag" {
   type = string
-  default = "debian-buster"
+  default = "latest"
 }
 
 variable "target_user" {
