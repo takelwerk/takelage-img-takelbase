@@ -1,6 +1,19 @@
 ---
+# project settings
 name: takelage-img-takelbase
+
+pipelines:
+  - prod
+
+images:
+  takelbase:
+    layers:
+      - site
+
+# results in packer_local/myproject-mypipeline:latest
 local_user: packer_local
+
+# push
 dockerhub_user: takelage
 dockerhub_repo: takelbase
 dockerhub_tag: debian-buster

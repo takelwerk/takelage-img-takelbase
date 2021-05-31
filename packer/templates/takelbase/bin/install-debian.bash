@@ -8,13 +8,11 @@ rm -fr /sbin/initctl
 cat > /sbin/initctl <<sbin_initctl
 #!/bin/sh
 ALIAS_CMD="\$(echo ""\$0"" | sed -e 's?/sbin/??')"
-
 case "\$ALIAS_CMD" in
     start|stop|restart|reload|status)
         exec service \$1 \$ALIAS_CMD
         ;;
 esac
-
 case "\$1" in
     list )
         exec service --status-all
