@@ -4,9 +4,9 @@ require 'rake'
 
 namespace :project do
   desc 'Create and deploy takelbase image to dockerhub'
-  task prod: %w[dockerhub:takelbase:prod:login
+  task prod: %w[dockerhub:project:prod:login
                 rubylint
                 image:build
-                dockerhub:takelbase:prod:tag
-                dockerhub:takelbase:prod:push]
+                dockerhub:project:prod:tag
+                dockerhub:project:prod:push]
 end
