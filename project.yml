@@ -10,7 +10,7 @@ local_user: packer_local
 
 images:
   project:
-    target_user: takelage
+    target_user: takelwerk
     target_repo: takelbase
     omit_pipeline_name: prod
     layers:
