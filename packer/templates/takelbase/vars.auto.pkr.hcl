@@ -5,7 +5,7 @@ variable "base_repo" {
 
 variable "base_tag" {
   type = string
-  default = "buster-slim"
+  default = "bullseye-slim"
 }
 
 variable "target_repo" {

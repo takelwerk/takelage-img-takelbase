@@ -3,15 +3,15 @@
 require 'rake'
 
 cmd_image_build = \
-  'docker pull debian:buster-slim && ' \
-  'mkdir -p packer/images/debian/buster && ' \
+  'docker pull debian:bullseye-slim && ' \
+  'mkdir -p packer/images/debian/bullseye && ' \
   'cd packer && packer build ' \
   "--var 'target_user=#{@project['local_user']}' " \
   "--var 'target_repo=#{@project['name']}-project-prod' " \
   'templates/takelbase'
 
 namespace :image do
-  desc 'Build takelbase debian buster image with packer'
+  desc 'Build takelbase debian bullseye image with packer'
   task :build do
     @commands << cmd_image_build
   end
