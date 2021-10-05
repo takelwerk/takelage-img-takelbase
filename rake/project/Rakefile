@@ -7,6 +7,6 @@ namespace :project do
   task prod: %w[dockerhub:login
                 rubylint
                 image:build
-                dockerhub:project:prod:tag
-                dockerhub:project:prod:push]
+                dockerhub:project:tag
+                dockerhub:project:push]
 end
