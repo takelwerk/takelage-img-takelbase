@@ -127,7 +127,6 @@ namespace :images do
               target_repo = "#{@project['name']}-#{image}-#{number}-#{layer}"
               # first image
               if index.zero?
-                puts images[image]
                 base_repo = images[image]['base_repo']
                 base_user = images[image]['base_user']
                 base_tag = images[image]['base_tag']
