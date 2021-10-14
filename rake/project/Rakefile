@@ -6,7 +6,8 @@ namespace :project do
   desc 'Create and deploy takelbase image to dockerhub'
   task prod: %w[dockerhub:login
                 rubylint
-                image:build
+                images:project:update
+                images:project:build
                 dockerhub:project:tag
                 dockerhub:project:push]
 end
