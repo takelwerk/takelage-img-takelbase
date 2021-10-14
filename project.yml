@@ -1,5 +1,4 @@
 ---
-# project settings
 name: takelage-img-takelbase
 version: debian-bullseye
 
@@ -7,8 +6,10 @@ local_user: packer_local
 
 images:
   project:
+    base_user: debian
+    base_tag: bullseye-slim
     target_user: takelwerk
     target_repo: takelbase
-    omit_pipeline_name: prod
+    packer_template_dir: templates/takelbase/docker
     layers:
       - site

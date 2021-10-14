@@ -1,14 +1,24 @@
 source "docker" "takelbase" {
-  export_path = "images/docker/${var.target_repo}.tar"
+  # export_path = "images/docker/${var.target_repo}.tar"
   image = "${var.base_repo}:${var.base_tag}"
+  commit = true
+  pull = false
   run_command = [
-    "-d",
-    "-i",
-    "-t",
+    "--detach",
+    "--interactive",
+    "--tty",
     "--name",
     "${var.target_repo}",
-    "{{ .Image }}",
+    "${var.base_user}:${var.base_tag}",
     "/bin/bash"
+  ]
+  changes = [
+    "WORKDIR /root",
+    "ENV DEBIAN_FRONTEND=noninteractive",
+    "ENV LANG=C.UTF-8",
+    "ENV SUPATH=$PATH",
+    "ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "CMD [\"/lib/systemd/systemd\"]"
   ]
 }
 
@@ -18,20 +28,11 @@ build {
   ]
 
   provisioner "shell" {
-    script = "templates/takelbase/bin/install-debian.bash"
+    script = "${var.packer_template_dir}/bin/install-debian.bash"
   }
 
-  post-processor "docker-import" {
-    keep_input_artifact = true
-    changes = [
-      "WORKDIR /root",
-      "ENV DEBIAN_FRONTEND=noninteractive",
-      "ENV LANG=C.UTF-8",
-      "ENV SUPATH=$PATH",
-      "ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
-      "CMD [\"/lib/systemd/systemd\"]"
-    ]
-    repository = "${var.target_user}/${var.target_repo}"
-    tag = "${var.target_tag}"
+  post-processor "docker-tag" {
+    repository = "${var.local_user}/${var.target_repo}"
+    tags = ["${var.target_tag}"]
   }
 }

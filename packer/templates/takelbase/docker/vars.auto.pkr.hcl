@@ -1,11 +1,25 @@
+variable "image_name" {
+  type = string
+}
+
+variable "ansible_playbook" {
+  type = string
+}
+
 variable "base_repo" {
   type = string
-  default = "debian"
 }
 
 variable "base_tag" {
   type = string
-  default = "bullseye-slim"
+}
+
+variable "base_user" {
+  type = string
+}
+
+variable "local_user" {
+  type = string
 }
 
 variable "target_repo" {
@@ -17,6 +31,6 @@ variable "target_tag" {
   default = "latest"
 }
 
-variable "target_user" {
+variable "packer_template_dir" {
   type = string
 }
