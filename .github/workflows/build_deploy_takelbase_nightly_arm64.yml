@@ -1,5 +1,5 @@
 ---
-name: Build and deploy takelruby arm64
+name: Build and deploy takelbase arm64
 
 on:
   schedule: # run daily at two o'clock CET

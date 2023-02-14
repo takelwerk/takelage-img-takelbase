@@ -1,4 +1,4 @@
-name: Build and deploy takelbase
+name: Build and deploy takelbase amd64
 
 on:
   schedule: # run daily at two o'clock CET
