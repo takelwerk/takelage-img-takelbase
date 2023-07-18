@@ -1,13 +1,13 @@
 ---
 name: takelage-img-takelbase
-version: debian-bullseye
+version: debian-bookworm
 
 local_user: packer_local
 
 images:
   project:
     base_user: debian
-    base_tag: bullseye-slim
+    base_tag: bookworm-slim
     target_user: takelwerk
     target_repo: takelbase
     packer_template_dir: templates/takelbase/docker
