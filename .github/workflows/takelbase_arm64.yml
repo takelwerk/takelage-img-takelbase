@@ -43,9 +43,6 @@ jobs:
         run: |
           cat << EOF > $HOME/takelprepare.sh
           #!/usr/bin/env bash
-          wget --header="Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -O /tmp/mutagen.tar.gz https://github.com/mutagen-io/mutagen/releases/download/v0.16.5/mutagen_linux_arm64_v0.16.5.tar.gz
-          sudo tar xvfz /tmp/mutagen.tar.gz -C /usr/local/bin
-          mutagen daemon start
           sudo mkdir -m 0755 -p /etc/apt/keyrings
           curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
           echo "deb [arch=arm64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu jammy stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
@@ -65,7 +62,10 @@ jobs:
           cat /home/ubuntu/.takelage.yml
           # Pull takelage image
           tau update
-          # Restart mutagen
+          # Install mutagen
+          MUTAGEN=$(docker inspect --format '{{ index .Config.Labels "mutagen" }}' takelwerk/takelbuild:latest-arm64)
+          wget --header="Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -O /tmp/mutagen.tar.gz https://github.com/mutagen-io/mutagen/releases/download/v$MUTAGEN/mutagen_linux_arm64_v$MUTAGEN.tar.gz
+          sudo tar xvfz /tmp/mutagen.tar.gz -C /usr/local/bin
           mutagen daemon stop
           mutagen daemon start
           # Start an instance of takelage
