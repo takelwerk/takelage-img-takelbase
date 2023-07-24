@@ -64,8 +64,8 @@ jobs:
           # Pull takelage image
           tau update
           # Install mutagen
-          MUTAGEN=$(docker inspect --format '{{ index .Config.Labels "mutagen" }}' takelwerk/takelbuild:latest-arm64)
-          wget --header="Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -O /tmp/mutagen.tar.gz https://github.com/mutagen-io/mutagen/releases/download/v$MUTAGEN/mutagen_linux_arm64_v$MUTAGEN.tar.gz
+          docker inspect --format '{{ index .Config.Labels "mutagen" }}' takelwerk/takelbuild:latest-arm64
+          wget --header="Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -O /tmp/mutagen.tar.gz https://github.com/mutagen-io/mutagen/releases/download/v$(docker inspect --format '{{ index .Config.Labels "mutagen" }}' takelwerk/takelbuild:latest-arm64)/mutagen_linux_arm64_v$(docker inspect --format '{{ index .Config.Labels "mutagen" }}' takelwerk/takelbuild:latest-arm64).tar.gz
           sudo tar xvfz /tmp/mutagen.tar.gz -C /usr/local/bin
           mutagen daemon stop
           mutagen daemon start
