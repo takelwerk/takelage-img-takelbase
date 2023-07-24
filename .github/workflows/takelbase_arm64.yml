@@ -64,10 +64,8 @@ jobs:
           # Pull takelage image
           tau update
           # Install mutagen
-          echo -n "MUTAGEN=" >> mutagen.txt
-          docker inspect --format '{{ index .Config.Labels "mutagen" }}' takelwerk/takelbuild:latest-arm64 >> mutagen.txt
-          cat mutagen.txt >> "$GITHUB_ENV"
-          wget --header="Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -O /tmp/mutagen.tar.gz https://github.com/mutagen-io/mutagen/releases/download/v${{ env.MUTAGEN }}/mutagen_linux_arm64_v${{ env.MUTAGEN }}.tar.gz
+          MUTAGEN=$(docker inspect --format '{{ index .Config.Labels "mutagen" }}' takelwerk/takelbuild:latest-arm64)
+          wget --header="Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -O /tmp/mutagen.tar.gz https://github.com/mutagen-io/mutagen/releases/download/v$MUTAGEN/mutagen_linux_arm64_v$MUTAGEN.tar.gz
           sudo tar xvfz /tmp/mutagen.tar.gz -C /usr/local/bin
           mutagen daemon stop
           mutagen daemon start
@@ -120,14 +118,14 @@ jobs:
       - name: Run takelprepare in qemu vm
         run: |
           sshpass -p ubuntu scp -P 2222 -o StrictHostKeyChecking=accept-new $HOME/takelprepare.sh ubuntu@localhost:
-          sshpass -p ubuntu ssh -p 2222 -o StrictHostKeyChecking=accept-new ubuntu@localhost sh takelprepare.sh
+          sshpass -p ubuntu ssh -p 2222 -o StrictHostKeyChecking=accept-new ubuntu@localhost bash takelprepare.sh
 
       - name: Run takeldocker in qemu vm
         run: |
           sshpass -p ubuntu scp -P 2222 -o StrictHostKeyChecking=accept-new $HOME/takeldocker.sh ubuntu@localhost:
-          sshpass -p ubuntu ssh -p 2222 -o StrictHostKeyChecking=accept-new ubuntu@localhost sh takeldocker.sh
+          sshpass -p ubuntu ssh -p 2222 -o StrictHostKeyChecking=accept-new ubuntu@localhost bash takeldocker.sh
 
       - name: Run takelaction in qemu vm
         run: |
           sshpass -p ubuntu scp -P 2222 -o StrictHostKeyChecking=accept-new $HOME/takelaction.sh ubuntu@localhost:
-          sshpass -p ubuntu ssh -p 2222 -o StrictHostKeyChecking=accept-new ubuntu@localhost sh takelaction.sh
+          sshpass -p ubuntu ssh -p 2222 -o StrictHostKeyChecking=accept-new ubuntu@localhost bash takelaction.sh
