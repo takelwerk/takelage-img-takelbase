@@ -39,6 +39,21 @@ jobs:
           ssh_pwauth: True
           EOF
 
+      - name: Setup qemu vm
+        run: |
+          sudo apt-get --yes install cloud-image-utils qemu-system-arm qemu-efi sshpass
+          cloud-localds $HOME/user-data.img $HOME/user-data
+          cp /usr/share/AAVMF/AAVMF_CODE.fd $HOME/flash1.img
+          wget http://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-arm64.img -O $HOME/jammy-server-cloudimg-arm64.img
+          qemu-img resize $HOME/jammy-server-cloudimg-arm64.img +30G
+          export RANDMAC=$(python3 $HOME/randmac.py)
+          sudo qemu-system-aarch64 -daemonize -display none -m 1024 -cpu cortex-a57 -M virt -drive if=pflash,file=/usr/share/AAVMF/AAVMF_CODE.fd,format=raw -drive if=pflash,file=$HOME/flash1.img,format=raw -drive if=none,file=$HOME/jammy-server-cloudimg-arm64.img,id=hd0 -drive file=$HOME/user-data.img,format=raw -device virtio-blk-device,drive=hd0 -netdev type=user,id=net0,hostfwd=tcp::2222-:22 -device virtio-net-device,netdev=net0,mac=$RANDMAC
+          until sshpass -p ubuntu ssh -p 2222 -o StrictHostKeyChecking=accept-new ubuntu@localhost true;do sleep 30; echo "Waiting for ssh..."; done
+
+      - name: Copy repository to qemu vm
+        run: |
+          sshpass -p ubuntu scp -P 2222 -o StrictHostKeyChecking=accept-new -r * ubuntu@localhost:
+
       - name: Create takelprepare
         run: |
           cat << EOF > $HOME/takelprepare.sh
@@ -52,6 +67,11 @@ jobs:
           sudo usermod -aG docker ubuntu
           EOF
 
+      - name: Run takelprepare in qemu vm
+        run: |
+          sshpass -p ubuntu scp -P 2222 -o StrictHostKeyChecking=accept-new $HOME/takelprepare.sh ubuntu@localhost:
+          sshpass -p ubuntu ssh -p 2222 -o StrictHostKeyChecking=accept-new ubuntu@localhost bash takelprepare.sh
+
       - name: Create takeldocker
         run: |
           cat << EOF > $HOME/takeldocker.sh
@@ -63,15 +83,33 @@ jobs:
           cat ~/.takelage.yml
           # Pull takelage image
           tau update
+
+      - name: Run takeldocker in qemu vm
+        run: |
+          sshpass -p ubuntu scp -P 2222 -o StrictHostKeyChecking=accept-new $HOME/takeldocker.sh ubuntu@localhost:
+          sshpass -p ubuntu ssh -p 2222 -o StrictHostKeyChecking=accept-new ubuntu@localhost bash takeldocker.sh
+
+      - name: Get mutagen version
+        run: |
+          MUTAGEN=sshpass -p ubuntu ssh -p 2222 -o StrictHostKeyChecking=accept-new ubuntu@localhost docker inspect --format '{{ index .Config.Labels "mutagen" }}' takelwerk/takelbuild:latest-amd64
+          echo "MUTAGEN=$MUTAGEN" >> "$GITHUB_ENV"
+
+      - name: Create takelmutagen
+        run: |
+          cat << EOF > $HOME/takelmutagen.sh
           # Install mutagen
-          MUTAGEN=$(docker inspect --format '{{ index .Config.Labels "mutagen" }}' takelwerk/takelbuild:latest-arm64)
-          wget --header="Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -O /tmp/mutagen.tar.gz https://github.com/mutagen-io/mutagen/releases/download/v$MUTAGEN/mutagen_linux_arm64_v$MUTAGEN.tar.gz
+          wget --header="Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -O /tmp/mutagen.tar.gz https://github.com/mutagen-io/mutagen/releases/download/v${{ env.MUTAGEN }}/mutagen_linux_arm64_v${{ env.MUTAGEN }}.tar.gz
           sudo tar xvfz /tmp/mutagen.tar.gz -C /usr/local/bin
           mutagen daemon stop
           mutagen daemon start
           # Start an instance of takelage
           tau docker container daemon
           EOF
+
+      - name: Run takelmutagen in qemu vm
+        run: |
+          sshpass -p ubuntu scp -P 2222 -o StrictHostKeyChecking=accept-new $HOME/takelmutagen.sh ubuntu@localhost:
+          sshpass -p ubuntu ssh -p 2222 -o StrictHostKeyChecking=accept-new ubuntu@localhost bash takelmutagen.sh
 
       - name: Create takelaction
         run: |
@@ -99,31 +137,6 @@ jobs:
           tau docker container command "rake dockerhub:project:manifest:create:version"
           tau docker container command "rake dockerhub:project:manifest:push:version"
           EOF
-
-      - name: Setup qemu vm
-        run: |
-          sudo apt-get --yes install cloud-image-utils qemu-system-arm qemu-efi sshpass
-          cloud-localds $HOME/user-data.img $HOME/user-data
-          cp /usr/share/AAVMF/AAVMF_CODE.fd $HOME/flash1.img
-          wget http://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-arm64.img -O $HOME/jammy-server-cloudimg-arm64.img
-          qemu-img resize $HOME/jammy-server-cloudimg-arm64.img +30G
-          export RANDMAC=$(python3 $HOME/randmac.py)
-          sudo qemu-system-aarch64 -daemonize -display none -m 1024 -cpu cortex-a57 -M virt -drive if=pflash,file=/usr/share/AAVMF/AAVMF_CODE.fd,format=raw -drive if=pflash,file=$HOME/flash1.img,format=raw -drive if=none,file=$HOME/jammy-server-cloudimg-arm64.img,id=hd0 -drive file=$HOME/user-data.img,format=raw -device virtio-blk-device,drive=hd0 -netdev type=user,id=net0,hostfwd=tcp::2222-:22 -device virtio-net-device,netdev=net0,mac=$RANDMAC
-          until sshpass -p ubuntu ssh -p 2222 -o StrictHostKeyChecking=accept-new ubuntu@localhost true;do sleep 30; echo "Waiting for ssh..."; done
-
-      - name: Copy repository to qemu vm
-        run: |
-          sshpass -p ubuntu scp -P 2222 -o StrictHostKeyChecking=accept-new -r * ubuntu@localhost:
-
-      - name: Run takelprepare in qemu vm
-        run: |
-          sshpass -p ubuntu scp -P 2222 -o StrictHostKeyChecking=accept-new $HOME/takelprepare.sh ubuntu@localhost:
-          sshpass -p ubuntu ssh -p 2222 -o StrictHostKeyChecking=accept-new ubuntu@localhost bash takelprepare.sh
-
-      - name: Run takeldocker in qemu vm
-        run: |
-          sshpass -p ubuntu scp -P 2222 -o StrictHostKeyChecking=accept-new $HOME/takeldocker.sh ubuntu@localhost:
-          sshpass -p ubuntu ssh -p 2222 -o StrictHostKeyChecking=accept-new ubuntu@localhost bash takeldocker.sh
 
       - name: Run takelaction in qemu vm
         run: |
