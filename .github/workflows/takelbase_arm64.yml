@@ -91,7 +91,8 @@ jobs:
 
       - name: Get mutagen version
         run: |
-          MUTAGEN=$(sshpass -p ubuntu ssh -p 2222 -o StrictHostKeyChecking=accept-new ubuntu@localhost docker inspect --format '{{ index .Config.Labels "mutagen" }}' takelwerk/takelbuild:latest-arm64)
+          MUTAGEN=`sshpass -p ubuntu ssh -p 2222 -o StrictHostKeyChecking=accept-new ubuntu@localhost docker inspect --format '{{ index .Config.Labels "mutagen" }}' takelwerk/takelbuild:latest-arm64`
+          echo "MUTAGEN=$MUTAGEN"
           echo "MUTAGEN=$MUTAGEN" >> "$GITHUB_ENV"
 
       - name: Create takelmutagen
