@@ -22,6 +22,11 @@ variable "local_user" {
   type = string
 }
 
+variable "mutagen" {
+  type = string
+  default = "invalid"
+}
+
 variable "target_repo" {
   type = string
 }
