@@ -3,8 +3,8 @@
 The 
 [takelwerk/takelbase](https://hub.docker.com/repository/docker/takelwerk/takelbase)
 docker image is based on 
-[debian:bullseye-slim](https://hub.docker.com/_/debian).
-It has been updated and systemd and ansible have been installed.
+[debian:bookworm-slim](https://hub.docker.com/_/debian).
+It has been updated and systemd and python have been installed.
 
 ## Framework Versions
 
