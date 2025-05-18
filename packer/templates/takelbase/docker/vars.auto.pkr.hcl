@@ -39,3 +39,7 @@ variable "target_tag" {
 variable "packer_template_dir" {
   type = string
 }
+
+variable "version" {
+  type = string
+}
